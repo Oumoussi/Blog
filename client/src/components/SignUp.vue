@@ -10,32 +10,23 @@
 </template>
 
 <script>
-import Register from '@/services/Register'
+
+    import AuthenticationService from '@/services/AuthenticationService'
     export default{
-        data () {
-            return {
-                email: '',
-                password: ''
-            }
-        },
-        watch: {
-            email (value) {
-                console.log('Email has changed', value)
-            }
-        },
-        methods:{
+        methods: {
             async register () {
-                const response = await Register.register({
+                try {
+                    const response = await AuthenticationService.register({
                     email: this.email,
                     password: this.password
-                })
-                console.log(response.data)
+                    })
+                    console.log(response.data)
+                    
+                } catch (error) {
+                    this.error = error.response.data.error
+                }
+                
             }
-        },
-        mounted () {
-            setTimeout(function(){
-                this.email = 'Hello'
-                }, 1000)
         }
     }
 
