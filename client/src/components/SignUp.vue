@@ -10,9 +10,15 @@
 </template>
 
 <script>
-
     import AuthenticationService from '@/services/AuthenticationService'
     export default{
+        data () {
+            return {
+            email: '',
+            password: '',
+            error: null
+            }
+        },
         methods: {
             async register () {
                 try {
@@ -21,11 +27,10 @@
                     password: this.password
                     })
                     console.log(response.data)
-                    
+                
                 } catch (error) {
                     this.error = error.response.data.error
                 }
-                
             }
         }
     }
