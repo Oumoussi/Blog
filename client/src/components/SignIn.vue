@@ -22,12 +22,12 @@
         methods: {
             async register () {
                 try {
-                    const response = await AuthenticationService.register({
+                    const response = await AuthenticationService.login({
                     email: this.email,
                     password: this.password
                     })
                     console.log(response.data)
-                
+                    this.$router.push({ name: 'Dashboard' });
                 } catch (error) {
                     this.error = error.response.data.error
                 }
@@ -80,4 +80,4 @@
         background-color: cyan; 
         color: black; 
     }
-</style>@/services/Register
+</style>@/services/Register./SignIn.vue

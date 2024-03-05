@@ -8,7 +8,7 @@ app.use(morgan('combined'))
 app.use(bodyParser.json())
 app.use(cors())
 
-app.post('/register', (req, res) => {
+app.post('/login', (req, res) => {
   res.send({
     message: `Bienvenue ${req.body.email}, ${req.body.password}!!!`
   })
