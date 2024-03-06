@@ -1,7 +1,7 @@
 
 <template>
     <img class="logo" alt="Vue logo" src="../assets/logo.png">
-    <h1>SignUp</h1>
+    <h1>SignIn</h1>
     <div class="register">
         <input type="email" placeholder="Entrez votre e-mail" v-model="email">
         <input type="password" placeholder="Entrez votre mot de passe" v-model="password">
