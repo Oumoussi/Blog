@@ -1,83 +1,197 @@
 
 <template>
-    <img class="logo" alt="Vue logo" src="../assets/logo.png">
-    <h1>SignIn</h1>
-    <div class="register">
-        <input type="email" placeholder="Entrez votre e-mail" v-model="email">
-        <input type="password" placeholder="Entrez votre mot de passe" v-model="password">
-        <button @click="register">S'enregistrer</button>
-    </div>
+    <header class="bg-gray-800 text-white body-font shadow w-full">
+        <img class="logo" alt="Vue logo" src="../assets/logo.png" @click="home">
+    </header>
+    <div style="height: 30px;"></div>
+    <div class="login-container">
+        <div class="login-form">
+            <h2>Log in</h2>
+            <form @submit.prevent="login">
+                <div class="input-group">
+                <label>Email</label>
+                <input type="email" placeholder="Enter your email" v-model="email" required>
+                </div>
+                <div class="input-group">
+                <label>Password</label>
+                <input type="password" placeholder="Enter your password" v-model="password" required>
+                </div>
+                <div class="remember-forgot">
+                <label><input type="checkbox" v-model="remember"> Remember Me</label>
+                <a href="#">Forgot Password</a>
+                </div>
+                <button type="submit" >Log In</button>
+                <div class="divider"></div>
+                <div class="signup-redirect">
+                Need an account? <a href="SignUp">Sign Up</a>
+                </div>
+            </form>
+        </div>
+  </div>
 </template>
 
 <script>
-    import AuthenticationService from '@/services/AuthenticationService'
+    import axios from 'axios';
     export default{
         data () {
             return {
-            email: '',
-            password: '',
-            error: null
+                users: [],
+                loggedIn: false,
+                userName: '',
+                error: null
             }
         },
         methods: {
-            async register () {
-                try {
-                    const response = await AuthenticationService.login({
+            async login () {
+                axios.post('http://localhost:8081/login', {
                     email: this.email,
                     password: this.password
+                })
+                .then(response => {
+                        localStorage.setItem('loggedIn', 'true');
+                        localStorage.setItem('userName', response.data.username);
+                        this.$router.push({ name: 'Dashboard' });
+                        this.email = '';
+                        this.password = '';
                     })
-                    console.log(response.data)
-                    this.$router.push({ name: 'Dashboard' });
-                } catch (error) {
-                    this.error = error.response.data.error
-                }
-            }
+                    .catch(error => {
+                        if (error.response) {
+                            if (error.response.status === 404) {
+                                this.error = "User not found. Please check your credentials.";
+                            } else if (error.response.status === 401) {
+                                this.error = "Incorrect password. Please try again.";
+                            } else {
+                                this.error = "An unexpected error occurred. Please try again later.";
+                            }
+                        } else if (error.request) {
+                            this.error = "No response from the server. Please check your network connection.";
+                        } else {
+                            this.error = "An error occurred. Please try again.";
+                        }
+                        alert(this.error);
+                    });
+
+            },
+            home () {
+              this.$router.push({ name: 'Dashboard' });
+            },
+
+        },
+        created () {
+            document.title = "SignIn";
         }
     }
 
 </script>
 
 <style>
-    .logo{
-        width: 100px;
+    img {
+        margin: auto auto;
+        width: 60px;
+        padding-bottom: 5px;
+        cursor: pointer;
     }
 
-    .register input {
-        padding: 10px; 
-        margin: auto auto; 
-        margin-bottom: 20px; 
-        display: inline-block; 
+
+    .login-container {
+        max-width: 340px;
+        margin: auto;
+        padding: 20px;
         border: 1px solid #ccc;
-        border-radius: 4px; 
-        box-sizing: border-box; 
-        width: 25%; 
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
+
+    .login-form h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-family: 'Times New Roman';
+        font-size: 30px;
+        font-weight: bolder;
+    }
+
+    .input-group {
+        margin-bottom: 20px;
+    }
+
+    .input-group label {
         display: block;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
-        transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out; 
+        margin-bottom: 5px;
+        font-family:   Tahoma;
     }
 
-    .register input:focus {
-        border-color: #4CAF50; 
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); 
-        outline: none; 
+    .input-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
     }
 
-    .register button{
-        background-color: #4CAF50; 
-        border: none; 
-        color: white; 
-        padding: 15px 32px; 
-        text-align: center; 
+    .remember-forgot {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .remember-forgot a {
         text-decoration: none;
-        display: inline-block; 
-        font-size: 16px; 
-        margin: 4px 2px;
-        cursor: pointer; 
-        border-radius: 8px;
-        transition-duration: 0.4s;
+        color: #007bff;
     }
-    .register button:hover {
-        background-color: cyan; 
-        color: black; 
+
+    button[type="submit"] {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        color: #ffffff;
+        background-color: #28a745;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        transition: background-color 0.3s ease;
     }
-</style>@/services/Register./SignIn.vue
+
+    button[type="submit"]:hover {
+        background-color: #218838;
+    }
+
+    button[type="submit"]:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.5);
+    }
+
+    .divider {
+        border-top: 1px solid #ccc;
+        text-align: center;
+        line-height: 0.1em;
+        margin: 20px 0;
+    }
+
+    .divider:before {
+        content: "";
+        background: #fff;
+        position: relative;
+        top: -10px;
+        padding-right: 10px;
+    }
+
+    .teachable-login {
+        background-color: #55acee;
+    }
+
+    .teachable-login:hover {
+        background-color: #3b88c3;
+    }
+
+    .signup-redirect {
+        text-align: center;
+    }
+
+    .signup-redirect a {
+        text-decoration: none;
+        color: #007bff;
+    }
+</style>
