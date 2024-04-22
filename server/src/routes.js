@@ -108,7 +108,7 @@ module.exports = (app) => {
    *       200:
    *         description: An array of posts
    */
-  app.get('/posts', PostController.FetchAll)
+  app.get('/posts', PostController.listPosts)
 
   /**
    * @swagger
@@ -120,12 +120,7 @@ module.exports = (app) => {
    *       200:
    *         description: An array of categories
    */
-  app.get('/categories', (req, res) => {
-    db.query('SELECT * FROM categories', (err, result) => {
-      if (err) throw err
-      res.json(result)
-    })
-  })
+  app.get('/categories', CategorieController.FetchAll)
 
   /**
    * @swagger
@@ -137,17 +132,6 @@ module.exports = (app) => {
    *       200:
    *         description: A single category object
    */
-  app.get('/categorieById', CategorieController.FetchById)
 
-  /**
-   * @swagger
-   * /authorById:
-   *   get:
-   *     summary: Get an author by ID
-   *     description: Retrieves an author by their ID.
-   *     responses:
-   *       200:
-   *         description: A single author object
-   */
   app.get('/authorById', AuthorController.FetchById)
 }

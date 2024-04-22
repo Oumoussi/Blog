@@ -1,59 +1,70 @@
-const config = require('../config/config')
-const db = config.db()
+const { PrismaClient } = require('@prisma/client')
+const prisma = new PrismaClient()
+
 module.exports = {
 
   async register (req, res) {
     const { user, author } = req.body
     const { email, password } = user
     const { firstname, lastname, birthday } = author
-    const sql = 'INSERT INTO `users`(`email_user`, `pwd_user`) VALUES (?, ?)'
-    db.query(sql, [email, password], (err, results) => {
-      if (err) {
-        console.error(err)
-        res.status(500).send('Error adding the user')
-        return
-      }
-      const userId = results.insertId
-      const authorsSql = 'INSERT INTO `authors`(`user_id`, `first_name`, `last_name`, `date_bd`) VALUES (?, ?, ?, ?)'
-      db.query(authorsSql, [userId, firstname, lastname, birthday], (authorsErr, authorsResults) => {
-        if (authorsErr) {
-          res.status(500).send(authorsErr)
-          return
-        }
-        res.status(201).send('You have been registered successfully!')
-      })
-    })
-  },
-  login (req, res) {
-    const { email, password } = req.body
-    const sql = 'SELECT * FROM users where email_user = ? and pwd_user = ?'
-    db.query(sql, [email, password], (err, results) => {
-      if (err) {
-        res.status(500).send('Server error')
-        return
-      }
-      if (results.length === 0) {
-        res.status(404).send('User not found')
-      } else {
-        const user = results[0]
-        if (password === user.pwd_user) {
-          const userId = user.id
-          const authorsSql = 'SELECT * FROM authors WHERE user_id = ?'
-          db.query(authorsSql, [userId], (authorsErr, authorsResults) => {
-            if (authorsErr) {
-              res.status(500).send(authorsErr)
-              return
+
+    try {
+      const result = await prisma.$transaction(async (prisma) => {
+        const newUser = await prisma.user.create({
+          data: {
+            emailUser: email,
+            pwdUser: password,
+            Authors: {
+              create: {
+                firstName: firstname,
+                lastName: lastname,
+                dateBd: new Date(birthday)
+              }
             }
-            res.json({
-              message: `Welcome ${authorsResults[0].first_name}`,
-              username: authorsResults[0].first_name
-            })
-          })
-        } else {
-          res.status(401).json({ message: 'Incorrect password' })
+          }
+        })
+
+        return newUser
+      })
+
+      res.status(201).send(`You have been registered successfully! User ID: ${result.id}`)
+    } catch (error) {
+      console.error('Registration error:', error)
+      res.status(500).send('Error adding the user')
+    }
+  },
+
+  async login (req, res) {
+    const { email, password } = req.body
+
+    try {
+      const user = await prisma.user.findFirst({
+        where: {
+          emailUser: email,
+          pwdUser: password
+        },
+        include: {
+          Authors: true
         }
+      })
+      if (!user) {
+        res.status(404).send('User not found')
+        return
       }
-    })
+
+      if (user.Authors.length > 0) {
+        const author = user.Authors[0]
+        res.json({
+          message: `Welcome ${author.firstName}`,
+          username: author.firstName
+        })
+      } else {
+        res.status(404).send('Author details not found for this user.')
+      }
+    } catch (error) {
+      console.error('Login error:', error)
+      res.status(500).send('Server error')
+    }
   }
 
 }

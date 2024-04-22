@@ -1,11 +1,40 @@
-const config = require('../config/config')
-const db = config.db()
+const { PrismaClient } = require('@prisma/client')
+const prisma = new PrismaClient()
+
 module.exports = {
-  FetchAll (req, res) {
-    const query = 'SELECT posts.id, posts.title, posts.content, posts.created_at, authors.* FROM posts JOIN authors ON posts.author_id = authors.id;'
-    db.query(query, (err, result) => {
-      if (err) throw err
-      res.json(result)
-    })
+  async listPosts (req, res) {
+    try {
+      const posts = await prisma.post.findMany({
+        include: {
+          Author: {
+            select: {
+              firstName: true,
+              lastName: true
+            }
+          },
+          Category: {
+            select: {
+              name: true
+            }
+          }
+        }
+      })
+
+      if (posts.length === 0) {
+        res.status(404).send('No posts found')
+        return
+      }
+      res.json(posts.map(post => ({
+        id: post.id,
+        title: post.title,
+        content: post.content,
+        createdAt: post.createdAt,
+        authorName: post.Author ? `${post.Author.firstName} ${post.Author.lastName}` : 'No Author',
+        categoryName: post.Category ? post.Category.name : 'No Category'
+      })))
+    } catch (error) {
+      console.error('Error retrieving posts:', error)
+      res.status(500).send('Server error')
+    }
   }
 }

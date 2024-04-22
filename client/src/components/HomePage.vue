@@ -28,19 +28,23 @@
           </div>
         </div>
   </header>
+
   <div style="height: 20px;"></div>
+
   <div class="p-2 max-w-md mx-auto bg-white rounded-lg shadow-md" style="text-align: center;">
     <h2 class="text-lg font-bold text-gray-800">Hello !!!</h2>
     <p class="mt-1 text-black">This is a blog that I'm building to get to know the "Vue js" and the "Express Js"</p>
   </div>
 
+  <div style="height: 20px;"></div>
 
-<div>
-  <h1>Posts</h1>
-  <ul>
-    <li v-for="post in posts" :key="post.id">{{ post.title }} - {{ post.content }} - {{ post.last_name }} {{ post.first_name }} - {{ formatDate(post.created_at) }} </li>
-  </ul>
-</div>
+  <div class="posts-container">
+    <ul>
+      <li v-for="post in posts" :key="post.id" class="post-item">
+        <strong>{{ post.title }}</strong> - <span>{{ post.content }}</span> - <em>{{ post.authorName }}</em> - <time :datetime="formatDate(post.createdAt, 'datetime')">{{ formatDate(post.createdAt) }}</time>
+      </li>
+    </ul>
+  </div>
 
 <transition name="fade">
   <div v-if="toastVisible" class="toast">
@@ -130,6 +134,7 @@ export default{
 
 }
 </script>
+
 <style>
 .flex-1 input[type="text"] {
   margin: auto auto;
@@ -139,5 +144,53 @@ img {
   width: 60px;
   padding-bottom: 5px;
   cursor: pointer;
+}
+.posts-container {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+.post-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #dee2e6;
+  text-align: center;
+}
+
+.post-item:last-child {
+  border-bottom: none;
+}
+
+.post-item strong {
+  color: #007bff;
+}
+
+.post-item span {
+  color: #495057;
+}
+
+.post-item em {
+  color: #6c757d;
+  font-style: normal; /* Resets italic style if not desired */
+}
+
+.post-item time {
+  float: right;
+  color: #6c757d;
 }
 </style>

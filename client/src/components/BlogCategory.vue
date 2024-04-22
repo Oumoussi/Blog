@@ -89,7 +89,6 @@
             axios.get('http://localhost:8081/categories')
             .then(response => {
               this.categories = response.data;
-              console.log(response.data)
             })
             .catch(error => {
               console.error(error);
