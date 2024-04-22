@@ -8,46 +8,35 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  emailUser String   @unique
+  id        Int       @id @default(autoincrement())
+  emailUser String    @unique
   pwdUser   String
-  authors   Author[]
+  Authors   Author[]
 }
 
 model Post {
-  id         Int       @id @default(autoincrement())
-  title      String
-  content    String
-  authorId   Int?
-  createdAt  DateTime  @default(now())
-  categoryId Int
-  author     Author?   @relation(fields: [authorId], references: [id])
-  category   Category  @relation(fields: [categoryId], references: [id])
-  images     Image[]
+  id          Int       @id @default(autoincrement())
+  title       String
+  content     String
+  authorId    Int?
+  createdAt   DateTime  @default(now())
+  categorieId Int
+  Author      Author?   @relation(fields: [authorId], references: [id])
+  Category    Category  @relation(fields: [categorieId], references: [id])
 }
 
 model Category {
   id    Int    @id @default(autoincrement())
   name  String
-  posts Post[]
+  Posts Post[]
 }
 
 model Author {
-  id        Int      @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   lastName  String
   firstName String
   dateBd    DateTime
   userId    Int
-  user      User     @relation(fields: [userId], references: [id])
-  posts     Post[]
-}
-
-model Image {
-  id        Int     @id @default(autoincrement())
-  title     String
-  imageUrl  String  @map("image_url")
-  postId    Int?    @map("post_id")
-  post      Post?   @relation(fields: [postId], references: [id], onDelete: Cascade)
-
-  @@map("images")
+  User      User    @relation(fields: [userId], references: [id])
+  Posts     Post[]
 }

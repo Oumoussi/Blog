@@ -41,7 +41,7 @@
   <div class="posts-container">
     <ul>
       <li v-for="post in posts" :key="post.id" class="post-item">
-        <strong>{{ post.title }}</strong> - <span>{{ post.content }}</span> - <em>{{ post.authorName }}</em> - <time :datetime="formatDate(post.createdAt, 'datetime')">{{ formatDate(post.createdAt) }}</time>
+        <strong>{{ post.title }}</strong> - <span>{{ post.content }}</span> - <em>{{ post.authorName }}</em> <time :datetime="formatDate(post.createdAt, 'datetime')">{{ formatDate(post.createdAt) }}</time>
       </li>
     </ul>
   </div>
